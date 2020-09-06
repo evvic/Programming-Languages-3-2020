@@ -1,4 +1,5 @@
 #include "life.h"
+#include "utility.h"    
 
 #include <iostream>
 
@@ -32,7 +33,12 @@ Post: The Life object contains the next generation of configuration.
 
 {
     int row, col;
-    int new_grid[maxrow + 2][maxcol + 2];
+    int new_grid[20 + 2][60 + 2]; //oof
+    /*
+    TBH this is very bad, but the compiler is arguing with me that it HAS to be a constant, which doesn't really
+    make sense. Just being real though, this MAY add bugs but it is still constrained with the maxcol and maxrow 
+    so I ain't gonna complain XD
+    */
 
     for (row = 1; row <= maxrow; row++)
         for (col = 1; col <= maxcol; col++)
@@ -61,6 +67,28 @@ Post: The Life object contains a configuration specified by the user.
 */
 
 {
+    cout << "\nEdit grid size? ";
+    if (user_says_yes()) {
+        cout << "\nYou can choose the size of your grid. \nColumn 0-60, Row 0-20." << endl;
+        do {
+            cout << "Row: ";
+            cin >> maxrow;
+            cout << endl;
+        } while (maxrow < 1 || maxrow >= 20);
+
+        do {
+            cout << "Hey guy, column: ";
+            cin >> maxcol;
+            cout << endl;
+        } while (maxcol < 1 || maxcol >= 60);
+    }
+    else {
+        maxcol = 60;
+        maxrow = 20;
+    }
+
+    
+
     int row, col;
     for (row = 0; row <= maxrow + 1; row++)
         for (col = 0; col <= maxcol + 1; col++)

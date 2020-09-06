@@ -9,7 +9,9 @@ public:
     void print();
     void update();
 private:
-    int grid[maxrow + 2][maxcol + 2];  //  allows for two extra rows and columns
+    int maxrow, maxcol;
+    int grid[20 + 2][60 + 2];  //  allows for two extra rows and columns
+    //constant static error so declare as 
     int neighbor_count(int row, int col);
 };
 
