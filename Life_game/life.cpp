@@ -18,11 +18,83 @@ Post: The number of living neighbors of the specified cell is returned.
 {
     int i, j;
     int count = 0;
-    for (i = row - 1; i <= row + 1; i++)
-        for (j = col - 1; j <= col + 1; j++)
-            count += grid[i][j];  //  Increase the count if neighbor is alive.
-    count -= grid[row][col]; //  Reduce count, since cell is not its own neighbor.
-    return count;
+    
+    if (row == 1) {
+        if (col == 1) { //top left corner
+            for (i = row; i <= row + 1; i++)
+
+                for (j = col; j <= col + 1; j++)
+                    count += grid[i][j];  //  Increase the count if neighbor is alive.
+            count -= grid[row][col]; //  Reduce count, since cell is not its own neighbor.
+            return count;
+        }
+        else if (col = maxcol) { //top right corner
+            for (i = row; i <= row + 1; i++)
+
+                for (j = col - 1; j <= col + 1; j++)
+                    count += grid[i][j];  //  Increase the count if neighbor is alive.
+            count -= grid[row][col]; //  Reduce count, since cell is not its own neighbor.
+            return count;
+        }
+        else { //top row
+            for (i = row; i <= row + 1; i++)
+
+                for (j = col - 1; j <= col + 1; j++)
+                    count += grid[i][j];  //  Increase the count if neighbor is alive.
+            count -= grid[row][col]; //  Reduce count, since cell is not its own neighbor.
+            return count;
+        }
+    }
+    else if (row == maxrow) {
+        if (col == 1) {
+            for (i = row - 1; i <= row; i++)
+
+                for (j = col; j <= col + 1; j++)
+                    count += grid[i][j];  //  Increase the count if neighbor is alive.
+            count -= grid[row][col]; //  Reduce count, since cell is not its own neighbor.
+            return count;
+        }
+        else if (col == maxcol) {
+            for (i = row - 1; i <= row; i++)
+
+                for (j = col - 1; j <= col; j++)
+                    count += grid[i][j];  //  Increase the count if neighbor is alive.
+            count -= grid[row][col]; //  Reduce count, since cell is not its own neighbor.
+            return count;
+        }
+        else {
+            for (i = row - 1; i <= row; i++)
+
+                for (j = col - 1; j <= col + 1; j++)
+                    count += grid[i][j];  //  Increase the count if neighbor is alive.
+            count -= grid[row][col]; //  Reduce count, since cell is not its own neighbor.
+            return count;
+        }
+    }
+    else if (col == 1) {
+        for (i = row - 1; i <= row + 1; i++)
+
+            for (j = col; j <= col + 1; j++)
+                count += grid[i][j];  //  Increase the count if neighbor is alive.
+        count -= grid[row][col]; //  Reduce count, since cell is not its own neighbor.
+        return count;
+    }
+    else if (col == maxcol) {
+        for (i = row - 1; i <= row + 1; i++)
+
+            for (j = col - 1; j <= col; j++)
+                count += grid[i][j];  //  Increase the count if neighbor is alive.
+        count -= grid[row][col]; //  Reduce count, since cell is not its own neighbor.
+        return count;
+    }
+    else {
+        for (i = row - 1; i <= row + 1; i++)
+
+            for (j = col - 1; j <= col + 1; j++)
+                count += grid[i][j];  //  Increase the count if neighbor is alive.
+        count -= grid[row][col]; //  Reduce count, since cell is not its own neighbor.
+        return count;
+    }
 }
 
 void Life::update()
