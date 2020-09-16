@@ -1,5 +1,28 @@
 #include <iostream>
+#include <string>
+
 using namespace std;
+
+
+//not really a utiliy but temp here
+bool checkFax(char c) {
+	if (c == 'X' || c == ' ') {
+		return true;
+	}
+	else {
+		cout << "you don fucked up";
+		return false;
+	}
+}
+
+string spaceToScore(string formerRow) {
+	for (int i = 0; i < formerRow.size(); i++) {
+		if (formerRow.at(i) == ' ') {
+			formerRow.at(i) = '_';
+		}
+	}
+	return formerRow;
+}
 
 bool user_says_yes()
 {

@@ -14,3 +14,5 @@ enum Error_code {
 };
 
 bool user_says_yes();
+bool checkFax(char c);
+string spaceToScore(string formerRow);

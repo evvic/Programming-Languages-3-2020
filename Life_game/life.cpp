@@ -5,17 +5,123 @@
 #include <stdio.h>
 #include <conio.h> //_getch()
 #include <iomanip> //cout spacing
+#include <fstream> //file read & write
+#include <string>
 
 using namespace std;
 // Section 1.4:
 
-bool checkFax(char c) {
-    if (c == 'X' || c == ' ') {
-        return true;
+void Life::patternSaverDeluxe() {
+    string description;
+    string fileName;
+
+    cout << endl << endl;
+    cout << "\nSaving a pattern for Life...";
+
+    cout << "\n\nEnter the file name with .txt: ";
+    cin >> fileName;
+
+    ofstream outFS;
+    outFS.open(fileName); //this will corrupt a previous file if it had the same .txt name
+
+    cout << "\nEnter a short description.";
+    cout << "\n\t>";
+    //cin.clear();
+    getline(cin, description);
+    //cin.clear();
+
+    outFS << description << endl;
+
+    for (int row = 0; row < maxrow; row++) {
+        for (int col = 0; col < maxcol; col++) {
+            if (grid[row][col] == 1) {
+                outFS << 'X';
+            }
+            else {
+                outFS << '_';
+            }
+        }
+
+        outFS << endl;
     }
-    else {
-        cout << "you don fucked up";
-        return false;
+
+    outFS.close();
+}
+
+void Life::patternLoaderPro() {
+
+    string fileName;
+    string fileTxt;
+    
+    ifstream inFS;
+
+    do {
+        cout << "\nEnter the file name: ";
+        cin >> fileName;
+
+        inFS.open(fileName);
+
+        if (inFS.fail()) {
+            cout << "\n\tcould not open file";
+        }
+        else {
+            cout << "\tsuccessfuly opened...\n";
+        }
+    } while (inFS.fail());
+
+    getline(inFS, fileTxt);
+    //inFS.ignore();
+
+    cout << "\nDescription: " << fileTxt << endl;
+
+    for (int i = 0; inFS >> fileTxt; i++) {
+
+        for (int j = 0; j < 60; j++) { //looping through the 60 column and disecting
+
+
+            switch (fileTxt.at(j)) {
+            case '_':
+                grid[i][j] = 0;
+                break;
+            case 'x':
+                grid[i][j] = 1;
+                break;
+            case 'X':
+                grid[i][j] = 1;
+                break;
+            default:
+                cout << "XD";
+                break;
+            }
+        }
+    }
+
+    inFS.close();
+}
+
+void Life::userInput() {
+    char c;
+
+    cout << "Only press 'x' or '(space)' or else error." << endl;
+    for (int row = 0; row < maxrow; row++) {
+        cout << setw(3) << left << row + 1 << '.';
+        for (int col = 0; col < maxcol; col++) {
+            do {
+                c = _getch();
+                cout << c;
+                c = toupper(c);
+            } while (!checkFax(c));
+
+            if (c == 'X') {
+                grid[row][col] = 1;
+            }
+            else {
+                grid[row][col] = 0;
+            }
+
+        }
+        cout << "[next row]" << endl;
+
     }
 }
 
@@ -72,72 +178,63 @@ Post: The Life object contains a configuration specified by the user.
 */
 
 {
-    cout << "\nEdit grid size? ";
-    if (user_says_yes()) {
+    char f;
+
+    do {
+        cout << "\nEnter how you would like to play:";
+        cout << "\n\t -'o' to play original state.";
+        cout << "\n\t -'e' to edit grid size.";
+        cout << "\n\t -'p' to load custom pattern.";
+        cout << "\n\t> ";
+        f = _getch();
+        cin.clear();
+        cout << f << endl;
+
+        f = toupper(f);
+
+    } while (f != 'O' && f != 'E' && f != 'P');
+    
+    switch (f) {
+    case 'O':
+        maxcol = 60;
+        maxrow = 20;
+
+        userInput(); //get the Life board filled
+
+        cout << "\n\nSave this pattern ";
+        if (user_says_yes()) {
+            patternSaverDeluxe();
+        }
+        break;
+
+    case 'E':
         cout << "\nYou can choose the size of your grid. \nColumn 0-60, Row 0-20." << endl;
         do {
             cout << "Row: ";
             cin >> maxrow;
             cout << endl;
-        } while (maxrow < 1 || maxrow >= 20);
+        } while (maxrow < 1 || maxrow > 20);
 
         do {
             cout << "Hey guy, column: ";
             cin >> maxcol;
             cout << endl;
-        } while (maxcol < 1 || maxcol >= 60);
-    }
-    else {
-        maxcol = 60;
-        maxrow = 20;
-    }
+        } while (maxcol < 1 || maxcol > 60);
 
-
-    /*
-    int row, col;
-    for (row = 0; row <= maxrow + 1; row++)
-        for (col = 0; col <= maxcol + 1; col++)
-            grid[row][col] = 0;
-    cout << "List the coordinates for living cells." << endl;
-    cout << "Terminate the list with the special pair -1 -1" << endl;
-    cin >> row >> col;
-    while (row != -1 || col != -1) {
-        if (row >= 1 && row <= maxrow)
-            if (col >= 1 && col <= maxcol)
-                grid[row][col] = 1;
-            else
-                cout << "Column " << col << " is out of range." << endl;
-        else
-            cout << "Row " << row << " is out of range." << endl;
-        cin >> row >> col;
-    }
-    */
-
-    char c;
-
-
-    cout << "Only press 'x' or '(space)' or else error." << endl;
-    for (int row = 0; row < maxrow; row++) {
-        cout << setw(3) << left << row + 1 << '.';
-        for (int col = 0; col < maxcol; col++) {
-            do {
-                c = _getch();
-                cout << c;
-                c = toupper(c);
-            } while (!checkFax(c));
-
-            if (c == 'X') {
-                grid[row][col] = 1;
-            }
-            else {
-                grid[row][col] = 0;
-            }
-            
+        userInput(); //get the Life board filled
+        cout << "\n\nSave this pattern ";
+        if (user_says_yes()) {
+            patternSaverDeluxe();
         }
-        cout << "[next row]" << endl;
-        
+        break;
+    case 'P':
+        //LOAD PATTERN
+        patternLoaderPro(); //fill Life board with pattern
+        break;
+    default:
+        cout << right << "Aye you broke the switch statement LMAO";
+        break;
     }
-
 
 }
 void Life::print()
