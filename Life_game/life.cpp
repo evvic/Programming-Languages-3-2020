@@ -26,9 +26,8 @@ void Life::patternSaverDeluxe() {
 
     cout << "\nEnter a short description.";
     cout << "\n\t>";
-    //cin.clear();
+    cin.ignore(); //needed after cin for name
     getline(cin, description);
-    //cin.clear();
 
     outFS << description << endl;
 

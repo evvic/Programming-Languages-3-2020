@@ -34,10 +34,10 @@ Uses: The class Life and its methods initialize(), print(), and update().
         configuration.print();
         cout << "Continue viewing new generations? " << endl;
     }
-    /*
+    
     cout << "\nSave progress";
     if (user_says_yes()) { configuration.patternSaverDeluxe(); }
-    */
+    
 }
 
 
