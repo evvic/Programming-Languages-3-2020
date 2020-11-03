@@ -35,7 +35,7 @@ public:
 		this->count = f.count;
 	}
 
-	~queue_chain() { while (count-- > 0) pop(); } //deletes node chain & decrements count to 0
+	~queue_chain() { while (count > 0) pop(); } //deletes node chain & decrements count to 0
 
 	//pops head off, moves to previous node
 	bool pop() 
@@ -77,6 +77,18 @@ public:
 	int size() { return count; }
 
 	bool empty() { return (count == 0) ? true : false; }
+
+	bool clear() {
+		while (count > 0) pop();
+		if (count == 0) return true; 
+		else return false;
+	}
+
+	flux serve_and_retrieve() {
+		flux item = front();
+		pop();
+		return item;
+	}
 
 	flux front() { return head->data; }
 	
