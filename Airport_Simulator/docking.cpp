@@ -3,7 +3,8 @@
 #include "Utility.h"
 
 
-//P2, modified main ot give 2 runways: one for departing and one for arriving
+//P3, modified the program so there are 2 runways: arrivign & departing.
+// ALSO if one runway is empty/idle, the planes fromt he other runway can use the empty runway
 
 
    // Section 3.1:
@@ -129,6 +130,7 @@ public:
     Error_code can_depart(const Plane& current);
     Runway_activity activity(int time, Plane& moving);
     void shut_down(int time) const;
+    bool empty_queue(Plane_status huh);
 
 private:
     Extended_queue landing;
@@ -228,6 +230,20 @@ Uses:  class Extended_queue.
         num_land_accepted++;
 
     return result;
+}
+
+bool Runway::empty_queue(Plane_status huh) {
+    switch (huh) {
+    case arriving:
+        if (landing.empty()) return true;
+        break;
+    case departing:
+        if (takeoff_ext.empty()) return true;
+        break;
+    case null:
+        break;
+    }
+    return false;
 }
 
 
@@ -452,11 +468,41 @@ Uses: Classes Runway, Plane, Random and functions run_idle, initialize.
     for (int current_time = 0; current_time < end_time; current_time++) { //  loop over time intervals
 
         int number_arrivals = variable.poisson(arrival_rate);  //  current arrival requests
+        int number_departures = variable.poisson(departure_rate); //  current departure requests
+        //cout << endl << "number_arrivals: " << number_arrivals << "\tnumber_departures: " << number_departures << endl;
+
+        bool openrunway = false;
+        if (number_arrivals == 0 && arriving_runway.empty_queue(arriving)) {
+            //arriving runway is idle this turn
+            if (number_departures == 0 && departing_runway.empty_queue(departing)) {
+                //departing runway is idle this turn
+                //both are idle lmao
+                cout << endl << "both runways idle" << endl;
+            }
+            else {
+                //arriving runway is idle and departing runway could use it
+                cout << endl << "arriving runway idle & departing runway can use it" << endl;
+                openrunway = true;
+            }
+        }
+        else if (number_departures == 0 && departing_runway.empty_queue(departing)) {
+            //only departing runway is idle this turn & arriving runway could use it
+            cout << endl << "departing runway idle & arriving runway can use it" << endl;
+            openrunway = true;
+        }
 
         for (int i = 0; i < number_arrivals; i++) {
             Plane current_plane(flight_number++, current_time, arriving);
-            if (arriving_runway.can_land(current_plane) != success)
-                current_plane.refuse();
+            if (arriving_runway.can_land(current_plane) != success) {
+                if (openrunway) {
+                    cout << endl << "departing_runway open runway" << endl;
+                    departing_runway.can_land(current_plane);
+                    openrunway = false;
+                }
+                else {
+                    current_plane.refuse();
+                }
+            }                
         }
 
         Plane moving_plane;
@@ -467,20 +513,28 @@ Uses: Classes Runway, Plane, Random and functions run_idle, initialize.
             break;
         case idle:
             run_idle(current_time);
+
         }
 
-        int number_departures = variable.poisson(departure_rate); //  current departure requests
+        
 
         for (int j = 0; j < number_departures; j++) {
             Plane current_plane(flight_number++, current_time, departing);
             if (departing_runway.can_depart(current_plane) != success)
-                current_plane.refuse();
+                if (openrunway) {
+                    cout << endl << "arriving_runway open runway" << endl;
+                    arriving_runway.can_land(current_plane);
+                    openrunway = false;
+                }
+                else {
+                    current_plane.refuse();
+                }
         }
 
         switch (departing_runway.activity(current_time, moving_plane)) {
             //  Let at most one Plane onto the Runway at current_time.
-        case land:
-            moving_plane.land(current_time);
+        case takeoff_enum:
+            moving_plane.fly(current_time);
             break;
         case idle:
             run_idle(current_time);
