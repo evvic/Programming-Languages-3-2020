@@ -2,10 +2,8 @@
 #include "RANDOM.H"
 #include "Utility.h"
 
+//P5 added a CheckPlaneFuel() to decrement fuel level for each plane in queue waiting to land per unit time 
 
-//P4, modified the program so there are 3 runways: arriving, departing & backup arriving.
-// ALSO if arriving runway is full, the planes are redirected to land at backup arriving 
-// if back arriving is idle, departing planes can use it
 
 
    // Section 3.1:
@@ -14,13 +12,17 @@ enum Plane_status { null, arriving, departing };
 class Plane {
 public:
     Plane();
-    Plane(int flt, int time, Plane_status status);
+    Plane(int flt, int time, Plane_status status, int fuel_level);
     void refuse() const;
     void land(int time) const;
     void fly(int time) const;
     int started() const;
+    int getFuel();
+    void updateFuel(int f);
+    int getFlightNum();
 
 private:
+    int fuel;
     int flt_num;
     int clock_start;
     //int item, entry; Trying to find place for these to get rid of undeclared identifier
@@ -57,6 +59,15 @@ public:
     Error_code serve_and_retrieve(Queue_entry& item);
 };
 
+Error_code Extended_queue::serve_and_retrieve(Queue_entry& item) {
+    if (count <= 0) return underflow;
+    item = entry[front];
+    count--;
+    front = ((front + 1) == maxqueue) ? 0 : (front + 1);
+    return success;
+}
+
+
 Queue::Queue()
 /*
 Post: The Queue is initialized to be empty.
@@ -67,6 +78,7 @@ Post: The Queue is initialized to be empty.
     front = 0;
 }
 
+
 bool Queue::empty() const
 /*
 Post: Return true if the Queue is empty, otherwise return false.
@@ -74,6 +86,7 @@ Post: Return true if the Queue is empty, otherwise return false.
 {
     return count == 0;
 }
+
 
 Error_code Queue::append(const Queue_entry& item)
 /*
@@ -89,6 +102,7 @@ return an Error_code of overflow and leave the Queue unchanged.
     return success;
 }
 
+
 Error_code Queue::serve()
 /*
 Post: The front of the Queue is removed. If the Queue
@@ -102,6 +116,7 @@ is empty return an Error_code of underflow.
     return success;
 }
 
+
 Error_code Queue::retrieve(Queue_entry& item) const
 /*
 Post: The front of the Queue retrieved to the output
@@ -113,6 +128,7 @@ Post: The front of the Queue retrieved to the output
     item = entry[front];
     return success;
 }
+
 
 int Extended_queue::size() const
 /*
@@ -131,7 +147,7 @@ public:
     Error_code can_depart(const Plane& current);
     Runway_activity activity(int time, Plane& moving);
     void shut_down(int time) const;
-    bool empty_queue(Plane_status huh);
+    void CheckPlaneFuel(/*const Plane& current*/);
 
 private:
     Extended_queue landing;
@@ -148,6 +164,7 @@ private:
     int land_wait;                //  total time of planes waiting to land
     int takeoff_wait;             //  total time of planes waiting to take off
     int idle_time;                //  total time runway is idle
+    int num_crashes;              //  total crashes waiting to land
 };
 
 
@@ -206,8 +223,51 @@ Post:  The Runway data members are initialized to record no
     num_land_refused = num_takeoff_refused = 0;
     num_land_accepted = num_takeoff_accepted = 0;
     land_wait = takeoff_wait = idle_time = 0;
+    num_crashes = 0;
 }
 
+void Runway::CheckPlaneFuel(/*const Plane& current*/) {
+    /*
+        Cycles through Plane queue and decrements fuel level for each plane
+        Reorders queue for lowest fuel level priority
+        Reports any planes that crashed for not having any fuel left
+    */
+
+    int tfuel;
+    Plane tplane;
+
+    Extended_queue priority_planes;
+    Extended_queue other_planes;
+
+    while (landing.serve_and_retrieve(tplane) == success) {
+        tfuel = tplane.getFuel();
+        tfuel--;
+        tplane.updateFuel(tfuel);
+        
+        if(tfuel < 1) {
+            //fuel = 0 = plane crashes
+            cout << "Flight no. " << tplane.getFlightNum() << " ran out of fuel and crashed." << endl;
+            tplane.refuse();
+            num_crashes++;
+        }
+        else if (tfuel == 1) {
+            //put in front of queue
+            priority_planes.append(tplane);
+        }
+        else {
+            //put in queue
+            other_planes.append(tplane);
+        }
+        
+    }
+    //now fill original queue with the planes
+    while (priority_planes.serve_and_retrieve(tplane) == success) {
+        landing.append(tplane);
+    }
+    while (other_planes.serve_and_retrieve(tplane) == success) {
+        landing.append(tplane);
+    }
+}
 
 Error_code Runway::can_land(const Plane& current)
 /*
@@ -218,6 +278,8 @@ Uses:  class Extended_queue.
 */
 
 {
+    
+
     Error_code result;
     if (landing.size() < queue_limit)
         result = landing.append(current);
@@ -231,20 +293,6 @@ Uses:  class Extended_queue.
         num_land_accepted++;
 
     return result;
-}
-
-bool Runway::empty_queue(Plane_status huh) {
-    switch (huh) {
-    case arriving:
-        if (landing.empty()) return true;
-        break;
-    case departing:
-        if (takeoff_ext.empty()) return true;
-        break;
-    case null:
-        break;
-    }
-    return false;
 }
 
 
@@ -311,7 +359,7 @@ Uses:  class Extended_queue.
 }
 
 
-Plane::Plane(int flt, int time, Plane_status status)
+Plane::Plane(int flt, int time, Plane_status status, int fuel_level)
 /*
 Post:  The Plane data members flt_num, clock_start,
        and state are set to the values of the parameters flt,
@@ -319,6 +367,7 @@ Post:  The Plane data members flt_num, clock_start,
 */
 
 {
+    fuel = fuel_level;
     flt_num = flt;
     clock_start = time;
     state = status;
@@ -336,9 +385,22 @@ Post:  The Plane data members flt_num, clock_start,
        state are set to illegal default values.
 */
 {
+    fuel = 5;
     flt_num = -1;
     clock_start = -1;
     state = null;
+}
+
+int Plane::getFuel() {
+    return fuel;
+}
+
+void Plane::updateFuel(int f) {
+    fuel = f;
+}
+
+int Plane::getFlightNum() {
+    return flt_num;
 }
 
 
@@ -350,10 +412,16 @@ Post: Processes a Plane wanting to use Runway, when
 
 {
     cout << "Plane number " << flt_num;
-    if (state == arriving)
-        cout << " directed to another airport" << endl;
-    else
-        cout << " told to try to takeoff again later" << endl;
+    if (fuel <= 0) {
+        cout << " crashed." << endl;
+    }
+    else {
+        if (state == arriving)
+            cout << " directed to another airport" << endl;
+        else
+            cout << " told to try to takeoff again later" << endl;
+    }
+
 }
 
 
@@ -366,7 +434,7 @@ Post: Processes a Plane that is landing at the specified time.
     int wait = time - clock_start;
     cout << time << ": Plane number " << flt_num << " landed after "
         << wait << " time unit" << ((wait == 1) ? "" : "s")
-        << " in the takeoff queue." << endl;
+        << " in the takeoff queue with " << fuel << " fuel left." << endl;
 }
 
 
@@ -428,7 +496,9 @@ Post: Runway usage statistics are summarized and printed.
         << "Total number of planes left in landing queue "
         << landing.size() << endl
         << "Total number of planes left in takeoff queue "
-        << takeoff_ext.size() << endl;
+        << takeoff_ext.size() << endl
+        << "Total number of planes crashed due to empty fuel tank waiting to land "
+        << num_crashes << endl;
     cout << "Percentage of time runway idle "
         << 100.0 * ((float)idle_time) / ((float)time) << "%" << endl;
     cout << "Average wait in landing queue "
@@ -463,93 +533,45 @@ Uses: Classes Runway, Plane, Random and functions run_idle, initialize.
     int flight_number = 0;
     double arrival_rate, departure_rate;
     initialize(end_time, queue_limit, arrival_rate, departure_rate);
+    int fuel_rate = 5;
     Random variable;
-    Runway departing_runway(queue_limit);
-    Runway arriving_runway(queue_limit);
-    Runway arrivng_runway_backup(queue_limit); //used for arriving, if idle then also for departing/takeoff
+    Runway small_airport(queue_limit);
+
     for (int current_time = 0; current_time < end_time; current_time++) { //  loop over time intervals
 
         int number_arrivals = variable.poisson(arrival_rate);  //  current arrival requests
-        int number_departures = variable.poisson(departure_rate); //  current departure requests
-        //cout << endl << "number_arrivals: " << number_arrivals << "\tnumber_departures: " << number_departures << endl;
-
-        bool openrunway = false;
-
+        small_airport.CheckPlaneFuel();
 
         for (int i = 0; i < number_arrivals; i++) {
-            Plane current_plane(flight_number++, current_time, arriving);
-            if (arriving_runway.can_land(current_plane) != success) {
-                if (arrivng_runway_backup.can_land(current_plane) != success) {
-                    current_plane.refuse();
-                    openrunway = false;
-                }
-                else {
-                    cout << flight_number << ". arrival flight using backup arrival runway " << endl;
-                    if (arrivng_runway_backup.empty_queue(arriving) && arrivng_runway_backup.empty_queue(departing)) {
-                        openrunway = true; //backup runway is open
-                        cout << "\tbackup arrival_runway used for departing plane" << endl;
-                    }
-                        
-                }
-            }
-            else {
-                if (arrivng_runway_backup.empty_queue(arriving)) {
-                    openrunway = true; //backup runway is probably open
-                    cout << "\tbackup arrival_runway used for departing plane" << endl;
-                }
-                  
-            }
+            int fuel_level = variable.poisson(fuel_rate);
+            Plane current_plane(flight_number++, current_time, arriving, fuel_level);
+            if (small_airport.can_land(current_plane) != success)
+                current_plane.refuse();
+        }
+
+        int number_departures = variable.poisson(departure_rate); //  current departure requests
+
+        for (int j = 0; j < number_departures; j++) {
+            int fuel_level = variable.poisson(fuel_rate);
+            Plane current_plane(flight_number++, current_time, departing, fuel_level);
+            if (small_airport.can_depart(current_plane) != success)
+                current_plane.refuse();
         }
 
         Plane moving_plane;
-        switch (arriving_runway.activity(current_time, moving_plane)) {
+        switch (small_airport.activity(current_time, moving_plane)) {
             //  Let at most one Plane onto the Runway at current_time.
         case land:
             moving_plane.land(current_time);
             break;
-        case idle:
-            run_idle(current_time);
-
-        }
-
-        
-        for (int j = 0; j < number_departures; j++) {
-            Plane current_plane(flight_number++, current_time, departing);
-            if (departing_runway.can_depart(current_plane) != success)
-                if (openrunway) {
-                    cout << flight_number << ". takeoff flight using backup arrival runway " << endl;
-                    arrivng_runway_backup.can_land(current_plane);
-                    openrunway = false;
-                }
-                else {
-                    current_plane.refuse();
-                }
-        }
-
-        switch (departing_runway.activity(current_time, moving_plane)) {
-            //  Let at most one Plane onto the Runway at current_time.
         case takeoff_enum:
             moving_plane.fly(current_time);
-            break;
-        case idle:
-            run_idle(current_time);
-        }
-
-        switch (arrivng_runway_backup.activity(current_time, moving_plane)) {
-            //  Let at most one Plane onto the Runway at current_time.
-        case takeoff_enum:
-            moving_plane.fly(current_time);
-            break;
-        case land:
-            moving_plane.land(current_time);
             break;
         case idle:
             run_idle(current_time);
         }
     }
-    departing_runway.shut_down(end_time);
-    arriving_runway.shut_down(end_time);
-
+    small_airport.shut_down(end_time);
 }
 
 
