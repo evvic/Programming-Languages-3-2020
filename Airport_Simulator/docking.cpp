@@ -3,8 +3,9 @@
 #include "Utility.h"
 
 
-//P3, modified the program so there are 2 runways: arrivign & departing.
-// ALSO if one runway is empty/idle, the planes fromt he other runway can use the empty runway
+//P4, modified the program so there are 3 runways: arriving, departing & backup arriving.
+// ALSO if arriving runway is full, the planes are redirected to land at backup arriving 
+// if back arriving is idle, departing planes can use it
 
 
    // Section 3.1:
@@ -465,6 +466,7 @@ Uses: Classes Runway, Plane, Random and functions run_idle, initialize.
     Random variable;
     Runway departing_runway(queue_limit);
     Runway arriving_runway(queue_limit);
+    Runway arrivng_runway_backup(queue_limit); //used for arriving, if idle then also for departing/takeoff
     for (int current_time = 0; current_time < end_time; current_time++) { //  loop over time intervals
 
         int number_arrivals = variable.poisson(arrival_rate);  //  current arrival requests
@@ -472,37 +474,31 @@ Uses: Classes Runway, Plane, Random and functions run_idle, initialize.
         //cout << endl << "number_arrivals: " << number_arrivals << "\tnumber_departures: " << number_departures << endl;
 
         bool openrunway = false;
-        if (number_arrivals == 0 && arriving_runway.empty_queue(arriving)) {
-            //arriving runway is idle this turn
-            if (number_departures == 0 && departing_runway.empty_queue(departing)) {
-                //departing runway is idle this turn
-                //both are idle lmao
-                cout << endl << "both runways idle" << endl;
-            }
-            else {
-                //arriving runway is idle and departing runway could use it
-                cout << endl << "arriving runway idle & departing runway can use it" << endl;
-                openrunway = true;
-            }
-        }
-        else if (number_departures == 0 && departing_runway.empty_queue(departing)) {
-            //only departing runway is idle this turn & arriving runway could use it
-            cout << endl << "departing runway idle & arriving runway can use it" << endl;
-            openrunway = true;
-        }
+
 
         for (int i = 0; i < number_arrivals; i++) {
             Plane current_plane(flight_number++, current_time, arriving);
             if (arriving_runway.can_land(current_plane) != success) {
-                if (openrunway) {
-                    cout << endl << "departing_runway open runway" << endl;
-                    departing_runway.can_land(current_plane);
+                if (arrivng_runway_backup.can_land(current_plane) != success) {
+                    current_plane.refuse();
                     openrunway = false;
                 }
                 else {
-                    current_plane.refuse();
+                    cout << flight_number << ". arrival flight using backup arrival runway " << endl;
+                    if (arrivng_runway_backup.empty_queue(arriving) && arrivng_runway_backup.empty_queue(departing)) {
+                        openrunway = true; //backup runway is open
+                        cout << "\tbackup arrival_runway used for departing plane" << endl;
+                    }
+                        
                 }
-            }                
+            }
+            else {
+                if (arrivng_runway_backup.empty_queue(arriving)) {
+                    openrunway = true; //backup runway is probably open
+                    cout << "\tbackup arrival_runway used for departing plane" << endl;
+                }
+                  
+            }
         }
 
         Plane moving_plane;
@@ -517,13 +513,12 @@ Uses: Classes Runway, Plane, Random and functions run_idle, initialize.
         }
 
         
-
         for (int j = 0; j < number_departures; j++) {
             Plane current_plane(flight_number++, current_time, departing);
             if (departing_runway.can_depart(current_plane) != success)
                 if (openrunway) {
-                    cout << endl << "arriving_runway open runway" << endl;
-                    arriving_runway.can_land(current_plane);
+                    cout << flight_number << ". takeoff flight using backup arrival runway " << endl;
+                    arrivng_runway_backup.can_land(current_plane);
                     openrunway = false;
                 }
                 else {
@@ -535,6 +530,18 @@ Uses: Classes Runway, Plane, Random and functions run_idle, initialize.
             //  Let at most one Plane onto the Runway at current_time.
         case takeoff_enum:
             moving_plane.fly(current_time);
+            break;
+        case idle:
+            run_idle(current_time);
+        }
+
+        switch (arrivng_runway_backup.activity(current_time, moving_plane)) {
+            //  Let at most one Plane onto the Runway at current_time.
+        case takeoff_enum:
+            moving_plane.fly(current_time);
+            break;
+        case land:
+            moving_plane.land(current_time);
             break;
         case idle:
             run_idle(current_time);
