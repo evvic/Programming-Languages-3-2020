@@ -43,9 +43,43 @@ int List<List_entry>::getCount() {
 }
 
 template <class List_entry>
+Error_code List<List_entry>::interchange(int pos1, int pos2) {
+    if (pos1 > count || pos2 > count) return overflow;
+    if (pos1 == pos2) return duplicate_error;
+    if (pos1 < 0 || pos2 < 0) return underflow;
+    if (count < 2) return underflow;
+
+    Node<List_entry>* switcher = new Node<List_entry>;
+    Node<List_entry>* temp1 = new Node<List_entry>;
+    Node<List_entry>* temp2 = new Node<List_entry>;
+
+    temp1 = temp2 = head;
+
+    for (int i = 0; i < pos1; i++) {
+        temp1 = temp1->next;
+    }
+    for (int i = 0; i < pos2; i++) {
+        temp2 = temp2->next;
+    }
+
+    switcher->entry = temp1->entry;
+    temp1->entry = temp2->entry;
+    temp2->entry = switcher->entry;
+
+    return success;
+}
+
+
+template <class List_entry>
 Error_code List<List_entry>::median(List_entry& x) {
     Node<List_entry>* temp = new Node<List_entry>;
     temp = head;
+
+    if (count == 0) return underflow;
+    if (count == 1) {
+        x = temp->entry;
+        return success;
+    }
 
     if (count % 2 == 0) {
         for (int i = 0; i < (count/2); i++) {

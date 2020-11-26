@@ -13,7 +13,9 @@ Error_code insert_last(const List_entry& x, List<List_entry>& a_list);
 template <class List_entry>
 Error_code remove_last(List_entry& x, List< List_entry>& a_list);
 template <class List_entry>
-Error_code median_list(List_entry& x, List< List_entry>& a_list);
+Error_code median_list(List_entry& x, List<List_entry>& a_list);
+template <class List_entry>
+Error_code interchange(int pos1, int pos2, List< List_entry>& a_list);
 
 
 
@@ -27,6 +29,13 @@ int main() {
 }
 
 template <class List_entry>
+Error_code interchange(int pos1, int pos2, List< List_entry>& a_list)
+//interchanges the entries at positions pos1and pos2 of the List a_list.
+{
+	return a_list.interchange(pos1, pos2);
+}
+
+template <class List_entry>
 Error_code median_list(List_entry& x, List< List_entry>& a_list)
 /*
 copies the central entry of the
@@ -34,7 +43,7 @@ List a_list to x if a_list has an odd number of entries; otherwise, it copies th
 left - central entry of a_list to x.
 */
 {
-
+	return a_list.median(x);
 }
 
 template <class List_entry>
