@@ -27,6 +27,7 @@ public:
 
     Error_code insert(int position, const List_entry& x);
     Error_code remove(int position, List_entry& x);
+    Error_code median(List_entry& x);
 
     void setHead(Node<List_entry>* h);
     Node<List_entry>* getHead();

@@ -10,7 +10,13 @@ template <class List_entry>
 Error_code remove_first(List_entry& x, List<List_entry>& a_list);
 template <class List_entry>
 Error_code insert_last(const List_entry& x, List<List_entry>& a_list);
-//inserts x as the last entry of the List a_list.
+template <class List_entry>
+Error_code remove_last(List_entry& x, List< List_entry>& a_list);
+template <class List_entry>
+Error_code median_list(List_entry& x, List< List_entry>& a_list);
+
+
+
 
 
 int main() {
@@ -21,7 +27,27 @@ int main() {
 }
 
 template <class List_entry>
-Error_code insert_last(const List_entry& x, List<List_entry>& a_list) {
+Error_code median_list(List_entry& x, List< List_entry>& a_list)
+/*
+copies the central entry of the
+List a_list to x if a_list has an odd number of entries; otherwise, it copies the
+left - central entry of a_list to x.
+*/
+{
+
+}
+
+template <class List_entry>
+Error_code remove_last(List_entry& x, List< List_entry>& a_list) 
+//removes the last entry of a_list, copying it to x.
+{
+	return a_list.remove(a_list.getCount(), x);
+}
+
+template <class List_entry>
+Error_code insert_last(const List_entry& x, List<List_entry>& a_list)
+//inserts x as the last entry of the List a_list.
+{
 	return a_list.insert(a_list.getCount(), x);
 }
 

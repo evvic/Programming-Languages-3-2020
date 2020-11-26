@@ -43,6 +43,28 @@ int List<List_entry>::getCount() {
 }
 
 template <class List_entry>
+Error_code List<List_entry>::median(List_entry& x) {
+    Node<List_entry>* temp = new Node<List_entry>;
+    temp = head;
+
+    if (count % 2 == 0) {
+        for (int i = 0; i < (count/2); i++) {
+            temp = temp->next;
+        }
+        x = temp->entry;
+    }
+    else {
+        for (int i = 0; i < (count / 2) + 1; i++) {
+            temp = temp->next;
+        }
+        x = temp->entry;
+    }
+
+    return success;
+
+}
+
+template <class List_entry>
 Error_code List<List_entry>::remove(int position, List_entry& x) {
     /*
     * position 0 -> count
@@ -56,24 +78,30 @@ Error_code List<List_entry>::remove(int position, List_entry& x) {
     Node<List_entry>* temp = new Node<List_entry>;
     temp = head;
 
-    for (int i = 0; i < position; i++) {
-        temp = temp->next;
+    if (position == 0) {
+        head = head->next;
     }
+    else {
+        for (int i = 0; i < position; i++) {
+            temp = temp->next;
+        }
 
-    Node<List_entry>* nearhead = new Node<List_entry>;
-    Node<List_entry>* neartail = new Node<List_entry>;
+        Node<List_entry>* nearhead = new Node<List_entry>;
+        Node<List_entry>* neartail = new Node<List_entry>;
+
+        nearhead = temp->back;
+        neartail = temp->next;
+
+        nearhead->next = neartail;
+        neartail->back = nearhead;
+    }
     
-    nearhead = temp->back;
-    neartail = temp->next;
-
-    nearhead->next = neartail;
-    neartail->back = nearhead;
-
     x = temp->entry;
 
     current = temp->next;
 
     delete temp;
+    count--;
 
     return success;
 }
