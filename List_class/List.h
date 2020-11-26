@@ -30,13 +30,19 @@ public:
     Error_code interchange(int pos1, int pos2);
     Error_code traverse(int start, int end);
 
+    void setHead(Node<List_entry>* h);
+    Node<List_entry>* getHead();
+    int getCount();
+
+    //operator overloading, these templates must be in the header
+
     List& operator = (const List& rhs) {
         const Node<List_entry>* cpcurrent = rhs.head;
         Node<List_entry>* lscurrent = new Node<List_entry>;
         lscurrent = NULL;
 
         if (cpcurrent != NULL) {
-            this->head = new Node<int>;
+            this->head = new Node<List_entry>;
             head->entry = cpcurrent->entry;
             lscurrent = head;
             cpcurrent = cpcurrent->next;
@@ -49,14 +55,37 @@ public:
             cpcurrent = cpcurrent->next;
         }
 
+        this->count = rhs.count;
+
         return *this;
     }
 
+    List& operator + (const List& rhs) {
+        const Node<List_entry>* cpcurrent = rhs.head;
 
+        this->current = this->head;
+        while (current->next != NULL) {
+            this->current = this->current->next;
+            //cout << this->current->entry;
+        }
 
-    void setHead(Node<List_entry>* h);
-    Node<List_entry>* getHead();
-    int getCount();
+        //this->current is now at this->tail
+
+        while (cpcurrent != NULL) {
+            this->count++;
+            Node<List_entry>* new_node = new Node<List_entry>;
+            this->current->next = new_node;
+
+            new_node->back = this->current;
+            new_node->entry = cpcurrent->entry;
+
+            this->current = this->current->next;
+            cpcurrent = cpcurrent->next; //incrememnt
+        }
+
+        return *this;
+    }
+    
 protected:
     //  Data members for the doubly-linked list implementation follow:
     int count;
