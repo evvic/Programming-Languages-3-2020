@@ -24,6 +24,9 @@ template <class List_entry>
 Error_code join(List<List_entry>& list1, List<List_entry>& list2);
 template <class List_entry>
 void reverse(List< List_entry>& a_list);
+template <class List_entry>
+Error_code split(List<List_entry>& source, List<List_entry>& oddlist, List<List_entry>& evenlist);
+
 
 
 
@@ -62,6 +65,33 @@ int main() {
 
 	//Eric.traverse(0, 3);
 
+}
+
+template <class List_entry>
+Error_code split(List<List_entry>& source, List<List_entry>& oddlist, List<List_entry>& evenlist)
+/*
+copies all entries from source so that those in odd - numbered positions make up oddlist and those in
+even - numbered positions make up evenlist.You may assume that oddlist and
+evenlist already exist,
+*/
+{
+
+	List_entry buffer;
+	int oddinc = 0, eveninc = 0;
+
+	for (int i = 0; i < source.getCount(); i++) {
+		if (i % 2 == 0) { //even
+			source.remove(0, buffer);
+			evenlist.insert(eveninc, buffer);
+			eveninc++;
+		}
+		else { //odd
+			source.remove(0, buffer);
+			evenlist.insert(oddinc, buffer);
+			oddinc++;
+		}
+	}
+	return success;
 }
 
 template <class List_entry>
