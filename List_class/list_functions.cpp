@@ -22,8 +22,8 @@ template <class List_entry>
 Error_code copy(List<List_entry>& dest, List<List_entry>& source);
 template <class List_entry>
 Error_code join(List<List_entry>& list1, List<List_entry>& list2);
-//copies all entries from list1 onto the end of list2;
-//list1 remains unchanged, as do all the entries previously in list2.
+template <class List_entry>
+void reverse(List< List_entry>& a_list);
 
 
 
@@ -42,19 +42,33 @@ int main() {
 
 	Oscar.traverse(0, 1);
 
-	Eric = Oscar;
 	cout << endl;
 
-	Eric.traverse(0, 1);
+	
 
-	Oscar.traverse(0, 1);
-
-	Eric + Oscar + Oscar;
+	Eric + Oscar;
 
 	cout << endl << "post addition";
 
-	Eric.traverse(0, 3);
 
+	Eric.reverse();
+	cout << endl << "post reverse";
+
+
+	Eric.traverse(0, 2);
+	cout << endl << "post transverse";
+
+	
+
+	//Eric.traverse(0, 3);
+
+}
+
+template <class List_entry>
+void reverse(List< List_entry>& a_list) 
+//reverses the order of all entries in a_list.
+{
+	a_list.reverse();
 }
 
 template <class List_entry>
@@ -62,7 +76,7 @@ Error_code join(List<List_entry>& list1, List<List_entry>& list2)
 //copies all entries from list1 onto the end of list2;
 //list1 remains unchanged, as do all the entries previously in list2.
 {
-
+	list2 + list1;
 }
 
 template <class List_entry>

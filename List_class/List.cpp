@@ -30,6 +30,8 @@ Node<Node_entry>::Node() {
     next = NULL;
 }
 
+
+
 template <class List_entry>
 void List<List_entry>::set_position(int position) const
 /*
@@ -59,6 +61,23 @@ template <class List_entry>
 int List<List_entry>::getCount() {
     return count;
 }
+
+//template <class List_entry>
+//Error_code List<List_entry>::reverse() {
+//    if (count == 0 || count == 1) return underflow;
+//    
+//
+//    while (head->next != NULL) {
+//        Node<string>* temp = new Node<string>;
+//        temp->back = head->next;
+//        temp->next = head->back;
+//        temp->entry = head->entry;
+//        head = head.next;
+//    }
+//
+//    return success;
+//}
+
 /*
 template<class List_entry>
 List<List_entry>& List<List_entry>::operator = (const List<List_entry>& rhs) {
@@ -86,7 +105,7 @@ List<List_entry>& List<List_entry>::operator = (const List<List_entry>& rhs) {
 */
 
 /* TRANSVERSE TEMPLATE NOT WORKING SO CREATED MULTIPLE FUNCTIONS WITH DIFFERENT DATA TYPES*/
-
+/*
 Error_code List<int>::traverse(int start, int end) {
     if (start == end) return duplicate_error;
     if (count < 1) return underflow;
@@ -103,14 +122,14 @@ Error_code List<int>::traverse(int start, int end) {
     if (start < end) {
         //traverse forward
         for (int i = 0; i < end - start; i++) {
-            cout << temp->entry << ' ';
+            //cout << temp->entry << ' ';
             temp = temp->next;
         }
     }
     else if (end < start) {
         //trverse backward
         for (int i = 0; i < start - end; i++) {
-            cout << temp->entry << ' ';
+            //cout << temp->entry << ' ';
             temp = temp->back;
         }
     }
@@ -230,9 +249,9 @@ Error_code List<string>::traverse(int start, int end) {
 
     return success;
 }
-
+*/
 /* END OF TRANSVERSE */
-
+/*
 template <class List_entry>
 Error_code List<List_entry>::interchange(int pos1, int pos2) {
     if (pos1 > count || pos2 > count) return overflow;
@@ -259,6 +278,7 @@ Error_code List<List_entry>::interchange(int pos1, int pos2) {
 
     return success;
 }
+*/
 
 
 template <class List_entry>
@@ -289,47 +309,46 @@ Error_code List<List_entry>::median(List_entry& x) {
 
 }
 
-template <class List_entry>
-Error_code List<List_entry>::remove(int position, List_entry& x) {
-    /*
-    * position 0 -> count
-    * current_position 0 -> count
-    
-    */
-    if (count > 10) return overflow;
-    if (position < 0) return underflow;
-    if (position > count) return overflow;
-
-    Node<List_entry>* temp = new Node<List_entry>;
-    temp = head;
-
-    if (position == 0) {
-        head = head->next;
-    }
-    else {
-        for (int i = 0; i < position; i++) {
-            temp = temp->next;
-        }
-
-        Node<List_entry>* nearhead = new Node<List_entry>;
-        Node<List_entry>* neartail = new Node<List_entry>;
-
-        nearhead = temp->back;
-        neartail = temp->next;
-
-        nearhead->next = neartail;
-        neartail->back = nearhead;
-    }
-    
-    x = temp->entry;
-
-    current = temp->next;
-
-    delete temp;
-    count--;
-
-    return success;
-}
+//template <class List_entry>
+//Error_code List<List_entry>::remove(int position, List_entry& x) {
+//    /*
+//    * position 0 -> count
+//    * current_position 0 -> count
+//    */
+//    if (count > 10) return overflow;
+//    if (position < 0) return underflow;
+//    if (position > count) return overflow;
+//
+//    Node<List_entry>* temp = new Node<List_entry>;
+//    temp = head;
+//
+//    if (position == 0) {
+//        head = head->next;
+//    }
+//    else {
+//        for (int i = 0; i < position; i++) {
+//            temp = temp->next;
+//        }
+//
+//        Node<List_entry>* nearhead = new Node<List_entry>;
+//        Node<List_entry>* neartail = new Node<List_entry>;
+//
+//        nearhead = temp->back;
+//        neartail = temp->next;
+//
+//        nearhead->next = neartail;
+//        neartail->back = nearhead;
+//    }
+//    
+//    x = temp->entry;
+//
+//    current = temp->next;
+//
+//    delete temp;
+//    count--;
+//
+//    return success;
+//}
 
 
 // TEMPLATE DID NOT WORK SO MULTIPLE COPIES OF INSERT WITH DIFFERENT DATA TYPES
