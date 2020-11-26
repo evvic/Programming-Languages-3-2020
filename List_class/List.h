@@ -3,7 +3,6 @@
 
 #include "Utility.h"
 
-
 template <class Node_entry>
 struct Node {
     //  data members
@@ -11,10 +10,7 @@ struct Node {
     Node<Node_entry>* next;
     Node<Node_entry>* back;
     //  constructors
-    Node() {
-        next = NULL;
-        back = NULL;
-    }
+    Node();
     Node(Node_entry, Node<Node_entry>* link_back = NULL,
         Node<Node_entry>* link_next = NULL);
 };
@@ -23,13 +19,39 @@ struct Node {
 template <class List_entry>
 class List {
 public:
-    List() { count = 0; }
+    List() {
+        current_position = count = 0;
+        current = head = NULL;
+    }
 
     Error_code insert(int position, const List_entry& x);
     Error_code remove(int position, List_entry& x);
     Error_code median(List_entry& x);
     Error_code interchange(int pos1, int pos2);
     Error_code traverse(int start, int end);
+
+    List& operator = (const List& rhs) {
+        const Node<List_entry>* cpcurrent = rhs.head;
+        Node<List_entry>* lscurrent = new Node<List_entry>;
+        lscurrent = NULL;
+
+        if (cpcurrent != NULL) {
+            this->head = new Node<int>;
+            head->entry = cpcurrent->entry;
+            lscurrent = head;
+            cpcurrent = cpcurrent->next;
+        }
+
+        while (cpcurrent != NULL) {
+            Node<List_entry>* new_node = new Node<List_entry>;
+            new_node->entry = cpcurrent->entry;
+            lscurrent = lscurrent->next;
+            cpcurrent = cpcurrent->next;
+        }
+
+        return *this;
+    }
+
 
 
     void setHead(Node<List_entry>* h);

@@ -11,6 +11,24 @@ using namespace std;
 //    count = 0;
 //}
 
+Node<char>::Node() {
+    entry = NULL;
+    back = NULL;
+    next = NULL;
+}
+
+Node<string>::Node() {
+    entry = "";
+    back = NULL;
+    next = NULL;
+}
+
+template <class Node_entry>
+Node<Node_entry>::Node() {
+    entry = 0;
+    back = NULL;
+    next = NULL;
+}
 
 template <class List_entry>
 void List<List_entry>::set_position(int position) const
@@ -41,15 +59,41 @@ template <class List_entry>
 int List<List_entry>::getCount() {
     return count;
 }
+/*
+template<class List_entry>
+List<List_entry>& List<List_entry>::operator = (const List<List_entry>& rhs) {
 
-template <class List_entry>
-Error_code List<List_entry>::traverse(int start, int end) {
+    const Node<List_entry>* cpcurrent = rhs.head;
+    Node<List_entry>* lscurrent = new Node<List_entry>;
+    lscurrent = NULL;
+
+    if (cpcurrent != NULL) {
+        this->head = new Node<int>;
+        head->entry = cpcurrent->entry;
+        lscurrent = head;
+        cpcurrent = cpcurrent->next;
+    }
+
+    while (cpcurrent != NULL) {
+        Node<List_entry>* new_node = new Node<List_entry>;
+        new_node->entry = cpcurrent->entry;
+        lscurrent = lscurrent->next;
+        cpcurrent = cpcurrent->next;
+    }
+
+    return *this;
+}
+*/
+
+/* TRANSVERSE TEMPLATE NOT WORKING SO CREATED MULTIPLE FUNCTIONS WITH DIFFERENT DATA TYPES*/
+
+Error_code List<int>::traverse(int start, int end) {
     if (start == end) return duplicate_error;
-    if (count < 2) return underflow;
+    if (count < 1) return underflow;
     if (start > count || end > count) return overflow;
     if (start < 0 || end < 0) return underflow;
 
-    Node<List_entry>* temp = new Node<List_entry>;
+    Node<int>* temp = new Node<int>;
     temp = head;
 
     for (int i = 0; i < start; i++) {
@@ -59,12 +103,14 @@ Error_code List<List_entry>::traverse(int start, int end) {
     if (start < end) {
         //traverse forward
         for (int i = 0; i < end - start; i++) {
+            cout << temp->entry << ' ';
             temp = temp->next;
         }
     }
     else if (end < start) {
         //trverse backward
         for (int i = 0; i < start - end; i++) {
+            cout << temp->entry << ' ';
             temp = temp->back;
         }
     }
@@ -76,6 +122,116 @@ Error_code List<List_entry>::traverse(int start, int end) {
 
     return success;
 }
+
+Error_code List<double>::traverse(int start, int end) {
+    if (start == end) return duplicate_error;
+    if (count < 1) return underflow;
+    if (start > count || end > count) return overflow;
+    if (start < 0 || end < 0) return underflow;
+
+    Node<double>* temp = new Node<double>;
+    temp = head;
+
+    for (int i = 0; i < start; i++) {
+        temp = temp->next;
+    }
+
+    if (start < end) {
+        //traverse forward
+        for (int i = 0; i < end - start; i++) {
+            cout << temp->entry << ' ';
+            temp = temp->next;
+        }
+    }
+    else if (end < start) {
+        //trverse backward
+        for (int i = 0; i < start - end; i++) {
+            cout << temp->entry << ' ';
+            temp = temp->back;
+        }
+    }
+    else { return fail; }
+
+    current = temp;
+
+    delete temp;
+
+    return success;
+}
+
+Error_code List<char>::traverse(int start, int end) {
+    if (start == end) return duplicate_error;
+    if (count < 1) return underflow;
+    if (start > count || end > count) return overflow;
+    if (start < 0 || end < 0) return underflow;
+
+    Node<char>* temp = new Node<char>;
+    temp = head;
+
+    for (int i = 0; i < start; i++) {
+        temp = temp->next;
+    }
+
+    if (start < end) {
+        //traverse forward
+        for (int i = 0; i < end - start; i++) {
+            cout << temp->entry << ' ';
+            temp = temp->next;
+        }
+    }
+    else if (end < start) {
+        //trverse backward
+        for (int i = 0; i < start - end; i++) {
+            cout << temp->entry << ' ';
+            temp = temp->back;
+        }
+    }
+    else { return fail; }
+
+    current = temp;
+
+    delete temp;
+
+    return success;
+}
+
+Error_code List<string>::traverse(int start, int end) {
+    if (start == end) return duplicate_error;
+    if (count < 1) return underflow;
+    if (start > count || end > count) return overflow;
+    if (start < 0 || end < 0) return underflow;
+
+    Node<string>* temp = new Node<string>;
+    temp = head;
+
+    for (int i = 0; i < start; i++) {
+        temp = temp->next;
+    }
+
+    if (start < end) {
+        //traverse forward
+        for (int i = 0; i < end - start; i++) {
+            cout << temp->entry << ' ';
+            temp = temp->next;
+        }
+    }
+    else if (end < start) {
+        //trverse backward
+        for (int i = 0; i < start - end; i++) {
+            cout << temp->entry << ' ';
+            temp = temp->back;
+        }
+    }
+    else { return fail; }
+
+    current = temp;
+
+    delete temp;
+
+    return success;
+}
+
+/* END OF TRANSVERSE */
 
 template <class List_entry>
 Error_code List<List_entry>::interchange(int pos1, int pos2) {
@@ -187,9 +343,13 @@ Error_code List<int>::insert(int position, const int& x)
     Node<int>* new_node = new Node<int>;
 
     if (position == 0) {
-        if (count == 0) new_node->back = 0;
+        if (count == 0) {
+            new_node->entry = x;
+            new_node->back = NULL;
+        }
         new_node->next = 0;
         // following = current;
+        head = new_node;
     }
     else {
         set_position(position - 1);

@@ -26,8 +26,27 @@ Error_code copy(List<List_entry>& dest, List<List_entry>& source);
 int main() {
 	//List<int> oscar;
 	List<int> Eric;
+	List<int> Oscar;
+
     
 	insert_first(69, Eric);
+	insert_first(420, Oscar);
+
+	
+	cout << " check";
+	Eric.traverse(0, 1);
+
+	Oscar.traverse(0, 1);
+
+	Eric = Oscar;
+	cout << endl;
+
+	Eric.traverse(0, 1);
+
+	Oscar.traverse(0, 1);
+
+
+
 }
 
 template <class List_entry>
@@ -37,7 +56,7 @@ source remains unchanged.You may assume that dest already exists, but any
 entries already in dest are to be discarded.
 */ 
 {
-
+	dest = source;
 }
 
 template <class List_entry>
@@ -93,5 +112,6 @@ template <class List_entry>
 Error_code insert_first(const List_entry& x, List<List_entry> &a_list)
 //inserts entry x into position 0 of the List a_list.
 {
+	cout << "insert first";
     return a_list.insert(0, x);
 }
