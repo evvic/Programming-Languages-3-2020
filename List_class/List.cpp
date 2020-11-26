@@ -43,6 +43,41 @@ int List<List_entry>::getCount() {
 }
 
 template <class List_entry>
+Error_code List<List_entry>::traverse(int start, int end) {
+    if (start == end) return duplicate_error;
+    if (count < 2) return underflow;
+    if (start > count || end > count) return overflow;
+    if (start < 0 || end < 0) return underflow;
+
+    Node<List_entry>* temp = new Node<List_entry>;
+    temp = head;
+
+    for (int i = 0; i < start; i++) {
+        temp = temp->next;
+    }
+
+    if (start < end) {
+        //traverse forward
+        for (int i = 0; i < end - start; i++) {
+            temp = temp->next;
+        }
+    }
+    else if (end < start) {
+        //trverse backward
+        for (int i = 0; i < start - end; i++) {
+            temp = temp->back;
+        }
+    }
+    else { return fail; }
+
+    current = temp;
+
+    delete temp;
+
+    return success;
+}
+
+template <class List_entry>
 Error_code List<List_entry>::interchange(int pos1, int pos2) {
     if (pos1 > count || pos2 > count) return overflow;
     if (pos1 == pos2) return duplicate_error;

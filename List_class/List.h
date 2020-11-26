@@ -29,6 +29,8 @@ public:
     Error_code remove(int position, List_entry& x);
     Error_code median(List_entry& x);
     Error_code interchange(int pos1, int pos2);
+    Error_code traverse(int start, int end);
+
 
     void setHead(Node<List_entry>* h);
     Node<List_entry>* getHead();
