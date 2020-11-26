@@ -30,6 +30,22 @@ Node<Node_entry>::Node() {
     next = NULL;
 }
 
+template <class List_entry>
+bool List<List_entry>::clear() {
+    List_entry buffer;
+    while (remove(0, buffer) == success);
+    return true;
+}
+
+template <class List_entry>
+bool List<List_entry>::empty() {
+    return (count == 0) ? true : false;
+}
+
+template <class List_entry>
+bool List<List_entry>::full() {
+    return (MAXSIZE == count) ? true : false;
+}
 
 
 template <class List_entry>
@@ -62,7 +78,48 @@ int List<List_entry>::getCount() {
     return count;
 }
 
-//template <class List_entry>
+template <class List_entry>
+Error_code List<List_entry>::retrieve(int pos, List_entry& x) {
+    if (x == 0) {
+        x = head->entry;
+        return success;
+    }
+    else {
+        Node<List_entry>* temp = new Node<List_entry>;
+        temp = head;
+
+        for (int i = 0; i < pos;  i++) {
+            temp = temp->next;
+        }
+
+        x = temp->entry;
+        //delete temp;
+        return success;
+    }
+    return fail;
+}
+
+template <class List_entry>
+Error_code List<List_entry>::replace(int pos, const List_entry& x) {
+    if (pos > count) return overflow;
+    if (pos < 0) return underflow;
+    if (count == 0) return underflow;
+
+    Node<List_entry>* temp = new Node<List_entry>;
+    temp = head;
+
+    for (int i = 0; i < pos; i++) {
+        temp = temp->next;
+    }
+
+    temp->entry = x;
+
+    return success;
+
+}
+
+
+//template <class List_entry>  
 //Error_code List<List_entry>::reverse() {
 //    if (count == 0 || count == 1) return underflow;
 //    
@@ -355,7 +412,7 @@ Error_code List<List_entry>::median(List_entry& x) {
 
 Error_code List<int>::insert(int position, const int& x)
 {
-    if (count > 10/*temp max count*/) return overflow;
+    if (count > MAXSIZE) return overflow;
     if (position < 0) return underflow;
     if (position > count) return overflow;
     

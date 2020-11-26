@@ -3,6 +3,8 @@
 
 #include "Utility.h"
 
+
+
 template <class Node_entry>
 struct Node {
     //  data members
@@ -23,10 +25,23 @@ public:
         current_position = count = 0;
         current = head = NULL;
     }
+    List(List_entry& x) {
+        current_position = count = 0;
+        current = head = NULL;
+
+        head->entry = x;
+        count++;
+    }
 
     Error_code insert(int position, const List_entry& x);
-    
     Error_code median(List_entry& x);
+    bool clear();
+    bool empty();
+    bool full();
+    Error_code retrieve(int pos, List_entry& x);
+    Error_code replace(int pos, const List_entry& x);
+
+
 
     void setHead(Node<List_entry>* h);
     Node<List_entry>* getHead();
@@ -37,11 +52,12 @@ public:
     * position 0 -> count
     * current_position 0 -> count
     */
-        if (count > 10) return overflow;
+        if (count > MAXSIZE) return overflow;
         if (position < 0) return underflow;
         if (position > count) return overflow;
 
         Node<List_entry>* temp = new Node<List_entry>;
+
         temp = head;
 
         if (position == 0) {
@@ -215,6 +231,7 @@ public:
 protected:
     //  Data members for the doubly-linked list implementation follow:
     int count;
+    const int MAXSIZE = 15;
     mutable int current_position;
     mutable Node<List_entry>* current;
 
